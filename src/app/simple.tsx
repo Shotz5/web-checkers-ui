@@ -5,17 +5,14 @@ import {
   Flex,
   Avatar,
   HStack,
-  IconButton,
   Button,
   Menu,
   MenuButton,
   MenuList,
   MenuItem,
   MenuDivider,
-  useDisclosure,
   useColorModeValue
 } from '@chakra-ui/react'
-import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons'
 import NavLink from './Components/NavLink';
 
 interface Links {
