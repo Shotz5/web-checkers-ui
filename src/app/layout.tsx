@@ -3,19 +3,19 @@ import { Providers } from "./providers";
 import Simple from "./simple";
 
 export default function RootLayout({
-  children,
+    children,
 }: Readonly<{
-  children: React.ReactNode;
+    children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en" style={{ colorScheme: "dark" }} data-theme="dark">
-      <body>
-        <Providers>
-          <Simple>
-            {children}
-          </Simple>
-        </Providers>
-      </body>
-    </html>
-  );
+    return (
+        <html lang="en" style={{ colorScheme: "dark" }} data-theme="dark">
+            <body>
+                <Providers>
+                    <Simple>
+                        {children}
+                    </Simple>
+                </Providers>
+            </body>
+        </html>
+    );
 }
