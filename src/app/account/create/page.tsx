@@ -1,25 +1,25 @@
 'use client'
 
-import { Button, Center, Input, Stack, Text, Heading, Divider, Alert, AlertIcon, AlertTitle, AlertDescription, Link, Checkbox } from "@chakra-ui/react";
+import { Button, Center, Input, Stack, Text, Heading, Divider, Alert, AlertIcon, AlertTitle, AlertDescription, Link } from "@chakra-ui/react";
 import axios from "axios";
 import { ChangeEvent, MouseEvent, useState } from "react";
 
-export default function LoginForm() {
+export default function SignUpForm() {
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [remember, setRemember] = useState(false);
     const [disabled, setDisabled] = useState(false);
     const [csrfError, setCsrfError] = useState(false);
-    const [loginError, setLoginError] = useState(false);
+    const [createdAccount, setCreatedAccount] = useState(false);
 
+    const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {
+        setName(e.target.value);
+    }
     const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
         setEmail(e.target.value);
     }
     const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
         setPassword(e.target.value);
-    }
-    const handleRememberChange = (e: ChangeEvent<HTMLInputElement>) => {
-        setRemember(e.target.checked);
     }
 
     async function handleSubmit(e: MouseEvent<HTMLButtonElement>) {
@@ -32,14 +32,13 @@ export default function LoginForm() {
         }
 
         try {
-            await axios.post('/api/account/login', {
+            await axios.post('/api/account/create', {
+                name: name,
                 email: email,
-                password: password,
-                remember: remember
+                password: password
             });
-            window.location.href = "/";
-        } catch (error: any) {
-            setLoginError(true);
+            setCreatedAccount(true);
+        } catch {
             setDisabled(false);
         }
     }
@@ -53,11 +52,11 @@ export default function LoginForm() {
                     <AlertDescription>Unable to create CSRF token</AlertDescription>
                 </Alert>
             }
-            {loginError &&
-                <Alert status="error">
+            {createdAccount &&
+                <Alert status="success">
                     <AlertIcon></AlertIcon>
-                    <AlertTitle>Authentication failed</AlertTitle>
-                    <AlertDescription>Username or password is incorrect</AlertDescription>
+                    <AlertTitle>Created account</AlertTitle>
+                    <AlertDescription>Successfully created account, click <Link href="/account/login">here</Link> to login</AlertDescription>
                 </Alert>
             }
             <Center>
@@ -70,17 +69,17 @@ export default function LoginForm() {
                     <Divider width={500} />
                     <Center>
                         <Stack spacing={3} width={300} margin={10}>
+                            <Text>Name</Text>
+                            <Input value={name} onChange={handleNameChange} disabled={disabled} name="name" placeholder="John Doe" />
                             <Text>Email</Text>
                             <Input value={email} onChange={handleEmailChange} disabled={disabled} name="email" type="email" placeholder="john.doe@checkers.com" />
                             <Text>Password</Text>
                             <Input value={password} onChange={handlePasswordChange} disabled={disabled} name="password" type="password" placeholder="**********" />
-                            <Text>Remember me</Text>
-                            <Checkbox name="remember" onChange={handleRememberChange}></Checkbox>
                             <Button onClick={handleSubmit} disabled={disabled}>Sign Up</Button>
                         </Stack>
                     </Center>
                 </Stack>
             </Center>
         </>
-    )
+    );
 }
