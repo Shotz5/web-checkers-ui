@@ -64,7 +64,7 @@ export default function LoginForm() {
                 <Stack>
                     <Center>
                         <Stack margin={10}>
-                            <Heading>Sign up for Checkers!</Heading>
+                            <Heading>Log in to play checkers!</Heading>
                         </Stack>
                     </Center>
                     <Divider width={500} />
@@ -76,7 +76,7 @@ export default function LoginForm() {
                             <Input value={password} onChange={handlePasswordChange} disabled={disabled} name="password" type="password" placeholder="**********" />
                             <Text>Remember me</Text>
                             <Checkbox name="remember" onChange={handleRememberChange}></Checkbox>
-                            <Button onClick={handleSubmit} disabled={disabled}>Sign Up</Button>
+                            <Button onClick={handleSubmit} disabled={disabled}>Log in!</Button>
                         </Stack>
                     </Center>
                 </Stack>
