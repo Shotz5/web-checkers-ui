@@ -42,17 +42,6 @@ export default function Simple({ children }: Readonly<{ children: React.ReactNod
     const [isAuth, setIsAuth] = useState(false);
     const [name, setName] = useState('');
 
-    useEffect(() => {
-        axios.get('/api/account/status')
-            .then((result: AxiosResponse) => {
-                setIsAuth(result.data.logged_in);
-                setName(result.data.name ?? 'Not Logged In');
-            })
-            .catch((error: AxiosError) => {
-                console.log(error);
-            });
-    }, [isAuth, name]);
-
     function logout() {
         axios.get('/api/account/logout')
             .then((result: AxiosResponse) => {

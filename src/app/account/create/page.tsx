@@ -75,7 +75,7 @@ export default function SignUpForm() {
                             <Input value={email} onChange={handleEmailChange} disabled={disabled} name="email" type="email" placeholder="john.doe@checkers.com" />
                             <Text>Password</Text>
                             <Input value={password} onChange={handlePasswordChange} disabled={disabled} name="password" type="password" placeholder="**********" />
-                            <Button onClick={handleSubmit} disabled={disabled}>Sign Up</Button>
+                            <Button onClick={handleSubmit} isDisabled={disabled}>Sign Up</Button>
                         </Stack>
                     </Center>
                 </Stack>
