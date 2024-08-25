@@ -2,7 +2,7 @@
 
 import "./globals.css";
 import { Providers } from "./providers";
-import Simple from "./simple";
+import NavBar from "./components/NavBar";
 
 export default function RootLayout({
     children,
@@ -13,9 +13,9 @@ export default function RootLayout({
         <html lang="en" style={{ colorScheme: "dark" }} data-theme="dark">
             <body>
                 <Providers>
-                    <Simple>
+                    <NavBar>
                         {children}
-                    </Simple>
+                    </NavBar>
                 </Providers>
             </body>
         </html>

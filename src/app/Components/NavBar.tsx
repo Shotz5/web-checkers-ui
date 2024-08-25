@@ -13,9 +13,9 @@ import {
     MenuDivider,
     useColorModeValue
 } from '@chakra-ui/react'
-import NavLink from './components/NavLink';
+import NavLink from './NavLink';
 import axios, { AxiosError, AxiosResponse } from 'axios';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from '@chakra-ui/next-js';
 
 interface Links {
@@ -38,15 +38,25 @@ const links: Links[] = [
     }
 ];
 
-export default function Simple({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function NavBar({ children }: Readonly<{ children: React.ReactNode }>) {
     const [isAuth, setIsAuth] = useState(false);
     const [name, setName] = useState('');
 
+    axios.get('/api/account/status')
+        .then((res: AxiosResponse) => {
+            setIsAuth(true);
+            setName(res.data.name);
+        })
+        .catch((err: AxiosError) => {
+            setIsAuth(false);
+            setName('Not logged in');
+        });
+
     function logout() {
         axios.get('/api/account/logout')
-            .then((result: AxiosResponse) => {
+            .then((res: AxiosResponse) => {
                 setIsAuth(false);
-                setName('');
+                setName('Not logged in');
             })
             .catch((error: AxiosError) => {
                 console.log(error);
