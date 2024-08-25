@@ -1,8 +1,22 @@
 'use client'
 
-import { Alert, AlertDescription, AlertIcon, AlertTitle, Button, Center, Divider, Heading, Stack, Text, Input, Checkbox } from "@chakra-ui/react";
-import axios, { AxiosError } from "axios";
+import { Alert, AlertDescription, AlertIcon, AlertTitle, Button, Center, Divider, Heading, Stack, Text, Input } from "@chakra-ui/react";
+import axios, { AxiosError, AxiosResponse } from "axios";
+import { AsyncSelectComponent } from "chakra-react-select";
+import dynamic from "next/dynamic";
 import { ChangeEvent, useState } from "react";
+
+const AsyncSelect = dynamic(() => import("chakra-react-select").then((module) => module.AsyncSelect), { ssr: false });
+
+interface User {
+    id: number,
+    username: string
+}
+
+interface OptionType {
+    value: number,
+    label: string,
+}
 
 export default function NewGame() {
     const [gameCreateError, setGameCreateError] = useState(false);
@@ -10,8 +24,29 @@ export default function NewGame() {
     const [disabled, setDisabled] = useState(false);
     const [opponent, setOpponent] = useState('');
 
-    const handleOpponentChange = (e: ChangeEvent<HTMLInputElement>) => {
-        setOpponent(e.target.value);
+    const handleOpponentChange = (newValue: unknown) => {
+        setOpponent(newValue as string);
+    }
+
+    const getUsers = (inputValue: string, callback: any) => {
+        let results: OptionType[] = [];
+        axios.get('/api/account/search', {
+            params: {
+                username: inputValue
+            }
+        }).then((res: AxiosResponse<User[]>) => {
+            res.data.forEach(element => {
+                results.push({
+                    value: element.id,
+                    label: element.username
+                })
+            });
+            callback(results);
+        }).catch((res: AxiosError) => {
+            setDisabled(true);
+            setAuthError(true);
+            callback([]);
+        });
     }
 
     const createNewGame = async () => {
@@ -41,7 +76,7 @@ export default function NewGame() {
             {authError &&
                 <Alert status="error">
                     <AlertIcon></AlertIcon>
-                    <AlertTitle>Unable to create game</AlertTitle>
+                    <AlertTitle>Unable to do action</AlertTitle>
                     <AlertDescription>Not authenticated, please login and try again.</AlertDescription>
                 </Alert>
             }
@@ -59,7 +94,7 @@ export default function NewGame() {
                     <Center>
                         <Stack spacing={3} width={300} margin={10}>
                             <Text>Opponent</Text>
-                            <Input value={opponent} onChange={handleOpponentChange} disabled={disabled} name="opponent" type="text" placeholder="Search Username" />
+                            <AsyncSelect value={opponent} isDisabled={disabled} loadOptions={getUsers} onChange={handleOpponentChange} />
                             <Button onClick={createNewGame} isDisabled={disabled || !opponent}>Create new game!</Button>
                         </Stack>
                     </Center>

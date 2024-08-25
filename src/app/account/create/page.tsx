@@ -8,6 +8,7 @@ export default function SignUpForm() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [username, setUsername] = useState('');
     const [disabled, setDisabled] = useState(false);
     const [csrfError, setCsrfError] = useState(false);
     const [createdAccount, setCreatedAccount] = useState(false);
@@ -20,6 +21,9 @@ export default function SignUpForm() {
     }
     const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
         setPassword(e.target.value);
+    }
+    const handleUsernameChange = (e: ChangeEvent<HTMLInputElement>) => {
+        setUsername(e.target.value);
     }
 
     async function handleSubmit(e: MouseEvent<HTMLButtonElement>) {
@@ -35,7 +39,8 @@ export default function SignUpForm() {
             await axios.post('/api/account/create', {
                 name: name,
                 email: email,
-                password: password
+                password: password,
+                username: username,
             });
             setCreatedAccount(true);
         } catch {
@@ -69,6 +74,8 @@ export default function SignUpForm() {
                     <Divider width={500} />
                     <Center>
                         <Stack spacing={3} width={300} margin={10}>
+                            <Text>Username</Text>
+                            <Input value={username} onChange={handleUsernameChange} disabled={disabled} name="username" placeholder="jdoe1" />
                             <Text>Name</Text>
                             <Input value={name} onChange={handleNameChange} disabled={disabled} name="name" placeholder="John Doe" />
                             <Text>Email</Text>
