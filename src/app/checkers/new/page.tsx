@@ -1,10 +1,10 @@
 'use client'
 
-import { Alert, AlertDescription, AlertIcon, AlertTitle, Button, Center, Divider, Heading, Stack, Text, Input } from "@chakra-ui/react";
-import axios, { AxiosError, AxiosResponse } from "axios";
-import { AsyncSelectComponent } from "chakra-react-select";
+import { Alert, AlertDescription, AlertIcon, AlertTitle, Button, Center, Divider, Heading, Stack, Text } from "@chakra-ui/react";
+import axios, { AxiosResponse } from "axios";
 import dynamic from "next/dynamic";
-import { ChangeEvent, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 const AsyncSelect = dynamic(() => import("chakra-react-select").then((module) => module.AsyncSelect), { ssr: false });
 
@@ -19,13 +19,13 @@ interface OptionType {
 }
 
 export default function NewGame() {
-    const [gameCreateError, setGameCreateError] = useState(false);
-    const [authError, setAuthError] = useState(false);
+    const router = useRouter();
+    const [errorMessage, setErrorMessage] = useState('');
     const [disabled, setDisabled] = useState(false);
-    const [opponent, setOpponent] = useState('');
+    const [opponent, setOpponent] = useState(0);
 
-    const handleOpponentChange = (newValue: unknown) => {
-        setOpponent(newValue as string);
+    const handleOpponentChange = (newValue: any) => {
+        setOpponent(newValue?.value ?? 0);
     }
 
     const getUsers = (inputValue: string, callback: any) => {
@@ -42,9 +42,9 @@ export default function NewGame() {
                 })
             });
             callback(results);
-        }).catch((res: AxiosError) => {
+        }).catch((err: any) => {
+            setErrorMessage(err.response.data.message);
             setDisabled(true);
-            setAuthError(true);
             callback([]);
         });
     }
@@ -52,32 +52,25 @@ export default function NewGame() {
     const createNewGame = async () => {
         setDisabled(true);
         try {
-            await axios.get('/api/board/create');
+            const response = await axios.get('/api/board/create', {
+                params: {
+                    opponent: opponent
+                }
+            });
+            router.push('/checkers/' + response.data.board);
         } catch (error: any) {
-            if (error.response.status === 401) {
-                setAuthError(true);
-            }
-            if (error.response.status === 500) {
-                setGameCreateError(true);
-            }
+            setErrorMessage(error.response.data.message);
             setDisabled(false);
         }
     }
 
     return (
         <>
-            {gameCreateError &&
+            {errorMessage &&
                 <Alert status="error">
                     <AlertIcon></AlertIcon>
                     <AlertTitle>Unable to create game</AlertTitle>
-                    <AlertDescription>Unable to create CSRF token</AlertDescription>
-                </Alert>
-            }
-            {authError &&
-                <Alert status="error">
-                    <AlertIcon></AlertIcon>
-                    <AlertTitle>Unable to do action</AlertTitle>
-                    <AlertDescription>Not authenticated, please login and try again.</AlertDescription>
+                    <AlertDescription>{errorMessage}</AlertDescription>
                 </Alert>
             }
             <Center>
@@ -94,7 +87,7 @@ export default function NewGame() {
                     <Center>
                         <Stack spacing={3} width={300} margin={10}>
                             <Text>Opponent</Text>
-                            <AsyncSelect value={opponent} isDisabled={disabled} loadOptions={getUsers} onChange={handleOpponentChange} />
+                            <AsyncSelect isDisabled={disabled} loadOptions={getUsers} onChange={handleOpponentChange} />
                             <Button onClick={createNewGame} isDisabled={disabled || !opponent}>Create new game!</Button>
                         </Stack>
                     </Center>
