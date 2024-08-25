@@ -2,15 +2,16 @@
 
 import { Button, Center, Input, Stack, Text, Heading, Divider, Alert, AlertIcon, AlertTitle, AlertDescription, Link, Checkbox } from "@chakra-ui/react";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 import { ChangeEvent, MouseEvent, useState } from "react";
 
 export default function LoginForm() {
+    const router = useRouter();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [remember, setRemember] = useState(false);
     const [disabled, setDisabled] = useState(false);
-    const [csrfError, setCsrfError] = useState(false);
-    const [loginError, setLoginError] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
     const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
         setEmail(e.target.value);
@@ -27,8 +28,8 @@ export default function LoginForm() {
 
         try {
             await axios.get('/api/csrf-cookie');
-        } catch {
-            setCsrfError(true);
+        } catch (err: any) {
+            setErrorMessage(err.response.data.message);
         }
 
         try {
@@ -37,27 +38,20 @@ export default function LoginForm() {
                 password: password,
                 remember: remember
             });
-            window.location.href = "/";
-        } catch (error: any) {
-            setLoginError(true);
+            router.push('/');
+        } catch (err: any) {
+            setErrorMessage(err.response.data.message);
             setDisabled(false);
         }
     }
 
     return (
         <>
-            {csrfError &&
+            {errorMessage &&
                 <Alert status="error">
                     <AlertIcon></AlertIcon>
-                    <AlertTitle>CSRF Token Error</AlertTitle>
-                    <AlertDescription>Unable to create CSRF token</AlertDescription>
-                </Alert>
-            }
-            {loginError &&
-                <Alert status="error">
-                    <AlertIcon></AlertIcon>
-                    <AlertTitle>Authentication failed</AlertTitle>
-                    <AlertDescription>Username or password is incorrect</AlertDescription>
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>{errorMessage}</AlertDescription>
                 </Alert>
             }
             <Center>

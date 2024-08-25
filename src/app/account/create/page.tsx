@@ -6,9 +6,13 @@ import { ChangeEvent, MouseEvent, useState } from "react";
 
 export default function SignUpForm() {
     const [name, setName] = useState('');
+    const [nameError, setNameError] = useState('');
     const [email, setEmail] = useState('');
+    const [emailError, setEmailError] = useState('');
     const [password, setPassword] = useState('');
+    const [passwordError, setPasswordError] = useState('');
     const [username, setUsername] = useState('');
+    const [usernameError, setUsernameError] = useState('');
     const [disabled, setDisabled] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [createdAccount, setCreatedAccount] = useState(false);
@@ -27,6 +31,11 @@ export default function SignUpForm() {
     }
 
     async function handleSubmit(e: MouseEvent<HTMLButtonElement>) {
+        setErrorMessage('');
+        setUsernameError('');
+        setNameError('');
+        setEmailError('');
+        setPasswordError('');
         setDisabled(true);
 
         try {
@@ -45,6 +54,12 @@ export default function SignUpForm() {
             setCreatedAccount(true);
         } catch (err: any) {
             setErrorMessage(err.response.data.message);
+            if (err.response.data.errors) {
+                setUsernameError(err.response.data.errors?.username ?? '');
+                setNameError(err.response.data.errors?.name ?? '');
+                setEmailError(err.response.data.errors?.email ?? '');
+                setPasswordError(err.response.data.errors?.password ?? '');
+            }
             setDisabled(false);
         }
     }
@@ -54,8 +69,8 @@ export default function SignUpForm() {
             {errorMessage &&
                 <Alert status="error">
                     <AlertIcon></AlertIcon>
-                    <AlertTitle>CSRF Token Error</AlertTitle>
-                    <AlertDescription>Unable to create CSRF token</AlertDescription>
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>{errorMessage}</AlertDescription>
                 </Alert>
             }
             {createdAccount &&
@@ -77,13 +92,17 @@ export default function SignUpForm() {
                         <Stack spacing={3} width={300} margin={10}>
                             <Text>Username</Text>
                             <Input value={username} onChange={handleUsernameChange} disabled={disabled} name="username" placeholder="jdoe1" />
+                            <Text fontSize="xs" color="red">{usernameError}</Text>
                             <Text>Name</Text>
                             <Input value={name} onChange={handleNameChange} disabled={disabled} name="name" placeholder="John Doe" />
+                            <Text fontSize="xs" color="red">{nameError}</Text>
                             <Text>Email</Text>
                             <Input value={email} onChange={handleEmailChange} disabled={disabled} name="email" type="email" placeholder="john.doe@checkers.com" />
+                            <Text fontSize="xs" color="red">{emailError}</Text>
                             <Text>Password</Text>
                             <Input value={password} onChange={handlePasswordChange} disabled={disabled} name="password" type="password" placeholder="**********" />
                             <Button onClick={handleSubmit} isDisabled={disabled}>Sign Up</Button>
+                            <Text fontSize="xs" color="red">{passwordError}</Text>
                         </Stack>
                     </Center>
                 </Stack>
