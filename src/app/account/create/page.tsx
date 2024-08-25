@@ -10,7 +10,7 @@ export default function SignUpForm() {
     const [password, setPassword] = useState('');
     const [username, setUsername] = useState('');
     const [disabled, setDisabled] = useState(false);
-    const [csrfError, setCsrfError] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
     const [createdAccount, setCreatedAccount] = useState(false);
 
     const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -31,8 +31,8 @@ export default function SignUpForm() {
 
         try {
             await axios.get('/api/csrf-cookie');
-        } catch {
-            setCsrfError(true);
+        } catch (err: any) {
+            setErrorMessage(err.response.data.message);
         }
 
         try {
@@ -43,14 +43,15 @@ export default function SignUpForm() {
                 username: username,
             });
             setCreatedAccount(true);
-        } catch {
+        } catch (err: any) {
+            setErrorMessage(err.response.data.message);
             setDisabled(false);
         }
     }
 
     return (
         <>
-            {csrfError &&
+            {errorMessage &&
                 <Alert status="error">
                     <AlertIcon></AlertIcon>
                     <AlertTitle>CSRF Token Error</AlertTitle>
